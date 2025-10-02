@@ -8,8 +8,10 @@ import { BASE_URL } from '../utils/constants';
 const Login = () => {
 const [emailId, setEmailId]=useState("sachin@gmail.com");
 const [password,setPassword]=useState("Sachin@123");
+const [showPassword, setShowPassword] = useState(false);   // 👈 added
 const dispatch=useDispatch()
 const navigate =useNavigate();
+const [error,setError]=useState();
 const handleLogin=async () => {
     try{
     const res=await axios.post(BASE_URL+"/login",{
@@ -22,7 +24,8 @@ dispatch(addUser(res.data))
 return navigate("/")
 }catch(err)
 {
-    console.error(err);
+    setError(err?.response?.data|| "Something went wrong ");
+    
 }
     
  };
@@ -42,10 +45,29 @@ return navigate("/")
     />
 
     <label className="label font-medium text-gray-700 mt-3">Password</label>
-    <input type="password" 
-     value={password}
-    className="input input-bordered w-full focus:ring-2 focus:ring-pink-500" placeholder="Enter your password" 
-    onChange={(e)=>setPassword(e.target.value)}/>
+    <div className="relative w-full">
+      <input 
+        type={showPassword ? "text" : "password"}   // 👈 toggle password visibility
+        value={password}
+        className="input input-bordered w-full focus:ring-2 focus:ring-pink-500 pr-12" 
+        placeholder="Enter your password" 
+        onChange={(e)=>setPassword(e.target.value)}
+      />
+      <button 
+        type="button" 
+        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+        onClick={() => setShowPassword(!showPassword)}
+      >
+        {showPassword ? "🙈" : "👁️"} {/* cool emoji toggle */}
+      </button>
+    </div>
+
+     {/* Error Message */}
+     {error && (
+       <div className="mt-3 p-2 rounded-lg text-sm font-semibold bg-red-100 text-red-700 border border-red-300 animate-pulse">
+         ⚠️ {error}
+       </div>
+     )}
 
     <button className="btn w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-purple-500 hover:to-pink-500 shadow-md" 
       onClick={handleLogin}>
