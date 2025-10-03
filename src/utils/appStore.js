@@ -1,10 +1,25 @@
+// import { configureStore} from "@reduxjs/toolkit";
+// import userReducer from "./userSlice"
+// import feedReducer from "./feedSlice"
+// import connectionReducre from"./connectionSlice"
+// const appStore=configureStore({
+//     reducer:{
+//         user:userReducer,
+//         feed:feedReducer,
+//         connection:connectionReducre,
+//     },
+// })
+// export default appStore;
 import { configureStore} from "@reduxjs/toolkit";
+import connectionReducer from "./connectionSlice";
 import userReducer from "./userSlice"
 import feedReducer from "./feedSlice"
-const appStore=configureStore({
-    reducer:{
-        user:userReducer,
-        feed:feedReducer,
+const appStore = configureStore({
+    reducer: {
+        user: userReducer,
+        feed: feedReducer,
+        connection: connectionReducer,
     },
-})
+});
+
 export default appStore;
