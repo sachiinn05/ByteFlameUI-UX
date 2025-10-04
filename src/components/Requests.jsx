@@ -9,6 +9,22 @@ const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
 
+  // Handle accept/reject
+  const reviewRequests = async (status, _id) => {
+    try {
+      await axios.post(
+        `${BASE_URL}/request/review/${status}/${_id}`,
+        {},
+        { withCredentials: true }
+      );
+      // Refresh list after review
+      fetchRequests();
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  // Fetch requests
   const fetchRequests = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/request/received", {
@@ -85,10 +101,16 @@ const Requests = () => {
 
                 {/* Actions */}
                 <div className="flex gap-4 mt-4">
-                  <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-full text-sm">
+                  <button
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-full text-sm"
+                    onClick={() => reviewRequests("accepted", req._id)}
+                  >
                     Accept
                   </button>
-                  <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-sm">
+                  <button
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-sm"
+                    onClick={() => reviewRequests("rejected", req._id)}
+                  >
                     Ignore
                   </button>
                 </div>
