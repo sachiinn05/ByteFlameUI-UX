@@ -1,54 +1,52 @@
+
 import axios from "axios";
 import React, { useEffect } from "react";
-import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addConnections } from "../utils/connectionSlice";
+import { BASE_URL } from "../utils/constants";
+import { addRequests } from "../utils/requestSlice";
 
-const Connections = () => {
-  const connections = useSelector((store) => store.connection);
+const Requests = () => {
   const dispatch = useDispatch();
+  const requests = useSelector((store) => store.requests);
 
-  const fetchConnections = async () => {
+  const fetchRequests = async () => {
     try {
-      const res = await axios.get(BASE_URL + "/user/connections", {
+      const res = await axios.get(BASE_URL + "/user/request/received", {
         withCredentials: true,
       });
-      dispatch(addConnections(res.data.data));
+      dispatch(addRequests(res.data.data));
     } catch (err) {
       console.log(err.message);
     }
   };
 
   useEffect(() => {
-    fetchConnections();
+    fetchRequests();
   }, []);
 
-  if (!connections) return <h1 className="text-center mt-24">Loading...</h1>;
+  if (!requests) return <h1 className="text-center mt-24">Loading...</h1>;
 
-  if (connections.length === 0)
+  if (requests.length === 0)
     return (
       <div className="flex justify-center items-center mt-24">
         <h1 className="text-2xl font-semibold text-gray-600">
-          No Connection Found
+          No Requests Found
         </h1>
       </div>
     );
 
   return (
     <div className="flex flex-col items-center mt-20 px-6 sm:px-10 lg:px-16">
-      <h1 className="text-3xl font-bold mb-8">Your Connections</h1>
+      <h1 className="text-3xl font-bold mb-8">Requests</h1>
 
-      {/* Grid for wider cards */}
+      {/* Grid like Connections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-        {connections.map((connection) => {
-          const user =
-            connection.fromUserId._id === localStorage.getItem("userId")
-              ? connection.toUserId
-              : connection.fromUserId;
+        {requests.map((req) => {
+          const user = req.fromUserId;
 
           return (
             <div
-              key={connection._id}
+              key={req._id}
               className="bg-white shadow-md rounded-xl flex items-center p-6 hover:shadow-xl transition duration-300 w-full"
             >
               {/* Profile image */}
@@ -58,7 +56,7 @@ const Connections = () => {
                 className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
               />
 
-              {/* Info section */}
+              {/* Info + Actions */}
               <div className="ml-6 flex-1">
                 <h2 className="text-xl font-semibold">
                   {user.firstName} {user.lastName}
@@ -74,9 +72,9 @@ const Connections = () => {
 
                 {user.skills?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {user.skills.map((skill, i) => (
+                    {user.skills.map((skill, idx) => (
                       <span
-                        key={i}
+                        key={idx}
                         className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
                       >
                         {skill}
@@ -84,6 +82,16 @@ const Connections = () => {
                     ))}
                   </div>
                 )}
+
+                {/* Actions */}
+                <div className="flex gap-4 mt-4">
+                  <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-full text-sm">
+                    Accept
+                  </button>
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-sm">
+                    Ignore
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -93,4 +101,5 @@ const Connections = () => {
   );
 };
 
-export default Connections;
+export default Requests;
+

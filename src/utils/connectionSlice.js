@@ -5,11 +5,11 @@ const connectionSlice = createSlice({
   initialState: null,   // ✅ array not null
   reducers: {
     addConnections: (state, action) => {
-         console.log("Dispatched addConnections:", action.payload)
+         
       return action.payload; // replace old with new data
     },
    removeConnection: () => {
-      console.log("Dispatched removeConnection");
+      
       return null;
     },
   }
