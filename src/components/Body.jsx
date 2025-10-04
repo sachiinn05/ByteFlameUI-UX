@@ -34,16 +34,34 @@ const Body = () => {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
         display: "flex",
         flexDirection: "column",
-        background: "linear-gradient(135deg, #ff6f91, #ff9671, #ffc75f, #f9f871)",
+        background:
+          "linear-gradient(135deg, #ff6f91, #ff9671, #ffc75f, #f9f871)",
       }}
-     >
+    >
+      {/* Navbar */}
       <NavBar />
-      <div style={{ flex: 1 }}>
+
+      {/* Scrollable Content */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          paddingTop: "4.5rem",   // navbar height
+          paddingBottom: "100px", // footer height + extra space
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "start",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
         <Outlet />
       </div>
+
+      {/* Footer */}
       <Footer />
     </div>
   );

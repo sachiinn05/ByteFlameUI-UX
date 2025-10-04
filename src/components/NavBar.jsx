@@ -22,15 +22,18 @@ const NavBar = () => {
 
   return (
     <div className="w-screen fixed top-0 left-0 z-50">
-      <nav className="backdrop-blur-md bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500 shadow-xl w-full px-6 md:px-12 py-3 flex items-center justify-between transition-all">
+      <nav className="backdrop-blur-md bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500 shadow-xl w-full px-6 md:px-12 py-5 flex items-center justify-between transition-all">
         
         {/* Logo */}
-        <Link
-          to="/"
-          className="text-2xl md:text-3xl font-extrabold text-white hover:text-yellow-300 transition-colors flex items-center gap-2"
-        >
-          🫶 ByteFlame
-          <span className="animate-pulse text-white">💖</span>
+        <Link to="/" className="flex items-center gap-2">
+          <img
+            src="https://www.grepixit.com/assets/img/dating-app/dating-app-development-company.jpg"
+            alt="ByteFlame Logo"
+            className="w-10 h-10 rounded-full object-cover hover:scale-110 transition-transform"
+          />
+          <span className="text-2xl md:text-3xl font-extrabold text-white hover:text-yellow-300 transition-colors">
+            ByteFlame
+          </span>
         </Link>
 
         {/* Search Input */}
