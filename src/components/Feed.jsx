@@ -9,28 +9,28 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
 
-  const getFeed = async () => {
-    if (feed) return;
-    try {
-      const res = await axios.get(BASE_URL + "/feed", {
-        withCredentials: true,
-      });
-      dispatch(addFeed(res.data));
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
+    const getFeed = async () => {
+      if (feed) return; // already have feed
+      try {
+        const res = await axios.get(BASE_URL + "/feed", {
+          withCredentials: true,
+        });
+        dispatch(addFeed(res.data));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     getFeed();
-  }, []);
+  }, [dispatch, feed]); 
+
+  if (!feed || feed.length === 0) return null;
 
   return (
-    feed && (
-      <div className="flex justify-center mt-8">
-        <UserCard user={feed[0]} />
-      </div>
-    )
+    <div className="flex justify-center mt-8">
+      <UserCard user={feed[0]} />
+    </div>
   );
 };
 

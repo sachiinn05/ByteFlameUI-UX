@@ -12,24 +12,24 @@ const Body = () => {
   const navigate = useNavigate();
   const userData = useSelector((store) => store.user);
 
-  const fetchUser = async () => {
-    if (userData) return;
-    try {
-      const res = await axios.get(BASE_URL + "/profile/view", {
-        withCredentials: true,
-      });
-      dispatch(addUser(res.data));
-    } catch (err) {
-      if (err.status === 401) {
-        navigate("/login");
-      }
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
+    const fetchUser = async () => {
+      if (userData) return; 
+      try {
+        const res = await axios.get(BASE_URL + "/profile/view", {
+          withCredentials: true,
+        });
+        dispatch(addUser(res.data));
+      } catch (err) {
+        if (err.response?.status === 401) {
+          navigate("/login");
+        }
+        console.log(err);
+      }
+    };
+
     fetchUser();
-  }, []);
+  }, [dispatch, navigate, userData]);
 
   return (
     <div
@@ -41,16 +41,16 @@ const Body = () => {
           "linear-gradient(135deg, #ff6f91, #ff9671, #ffc75f, #f9f871)",
       }}
     >
-      {/* Navbar */}
+  
       <NavBar />
 
-      {/* Scrollable Content */}
+   
       <div
         style={{
           flex: 1,
           overflowY: "auto",
-          paddingTop: "4.5rem",   // navbar height
-          paddingBottom: "100px", // footer height + extra space
+          paddingTop: "4.5rem", 
+          paddingBottom: "100px", 
           display: "flex",
           justifyContent: "center",
           alignItems: "start",
@@ -61,7 +61,7 @@ const Body = () => {
         <Outlet />
       </div>
 
-      {/* Footer */}
+    
       <Footer />
     </div>
   );
