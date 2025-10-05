@@ -25,7 +25,13 @@ const Feed = () => {
     getFeed();
   }, [dispatch, feed]); 
 
-  if (!feed || feed.length === 0) return null;
+if (!feed || feed.length === 0) 
+  return (
+    <h1 className="text-2xl font-bold text-center text-gray-500 mt-10">
+      No  new user found
+    </h1>
+  );
+
 
   return (
     <div className="flex justify-center mt-8">

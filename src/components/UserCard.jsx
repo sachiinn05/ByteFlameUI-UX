@@ -1,9 +1,27 @@
+import axios from "axios";
 import React from "react";
+import { BASE_URL } from "../utils/constants";
+import { useDispatch } from "react-redux";
+import { removeFromFeedUser } from "../utils/feedSlice";
 
 const UserCard = ({ user }) => {
+    const dispatch=useDispatch();
   if (!user || !user.firstName || !user.lastName) return null;
 
-  const { firstName, lastName, about, age, gender, photoUrl, skills = [] } = user;
+  const { _id,firstName, lastName, about, age, gender, photoUrl, skills = [] } = user;
+  const handleSendRequest=async(status,userId)=>{
+    try{
+      const _res=await axios.post(
+        BASE_URL+"/request/send/"+status+"/"+userId,
+        {},
+        {withCredentials:true}
+      );
+      dispatch(removeFromFeedUser(userId))
+    }catch(err)
+    {
+      console.log(err.message);
+    }
+  }
 
   return (
     <div className="relative w-96 h-[34rem] rounded-3xl overflow-hidden shadow-2xl bg-base-300 transform hover:scale-105 transition-transform duration-500 flex flex-col">
@@ -60,10 +78,14 @@ const UserCard = ({ user }) => {
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-3 mt-2">
-          <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-xl font-bold shadow-md hover:scale-110 transition-transform cursor-pointer">
+          <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-xl font-bold shadow-md hover:scale-110 transition-transform cursor-pointer"
+           onClick={()=>handleSendRequest("ignore",_id)}
+          >
             X
           </div>
-          <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white text-xl font-bold shadow-md hover:scale-110 transition-transform cursor-pointer">
+          <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white text-xl font-bold shadow-md hover:scale-110 transition-transform cursor-pointer"
+            onClick={()=>handleSendRequest("interested",_id)}
+          >
             ❤
           </div>
         </div>
