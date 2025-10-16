@@ -87,6 +87,14 @@ const NavBar = () => {
                   Requests
                 </Link>
               </li>
+               <li>
+                <Link
+                  to="/feed"
+                  className="hover:bg-pink-100 transition-colors rounded-md"
+                >
+                  Feeds
+                </Link>
+              </li>
               <li>
                 <button
                   onClick={handleLogout}
