@@ -36,12 +36,7 @@ const NavBar = () => {
           </span>
         </Link>
 
-        {/* Search Input */}
-        <input
-          type="text"
-          placeholder="Search"
-          className="input input-bordered rounded-full w-28 md:w-64 transition-all focus:w-64 focus:ring-2 focus:ring-pink-400 focus:outline-none bg-white/30 text-white placeholder-white/70 border-none backdrop-blur-sm"
-        />
+       
 
         {/* Profile Dropdown */}
         {user && (

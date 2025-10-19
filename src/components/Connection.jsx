@@ -1,12 +1,15 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
+import { Link } from "react-router-dom";
+import Chat from "./chat";
 
 const Connections = () => {
-  const connections = useSelector((store) => store.connection);
+  const connections = useSelector((store) => store.connection) || [];
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -14,22 +17,25 @@ const Connections = () => {
         const res = await axios.get(BASE_URL + "/user/connections", {
           withCredentials: true,
         });
-        dispatch(addConnections(res.data.data));
+        dispatch(addConnections(res.data.data || []));
       } catch (err) {
         console.log(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchConnections();
-  }, [dispatch]); // ✅ include dispatch as dependency
+  }, [dispatch]);
 
-  if (!connections) return <h1 className="text-center mt-24">Loading...</h1>;
+  if (loading)
+    return <h1 className="text-center mt-24 text-xl">Loading...</h1>;
 
-  if (connections.length === 0)
+  if (!connections.length)
     return (
       <div className="flex justify-center items-center mt-24">
         <h1 className="text-2xl font-semibold text-gray-600">
-          No Connection Found
+          No Connections Found
         </h1>
       </div>
     );
@@ -39,52 +45,55 @@ const Connections = () => {
       <h1 className="text-3xl font-bold mb-8">Your Connections</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-        {connections.map((connection) => {
-          const user =
-            connection.fromUserId._id === localStorage.getItem("userId")
-              ? connection.toUserId
-              : connection.fromUserId;
+        {connections.map((user) => (
+          <div
+            key={user._id} // stable key
+            className="bg-white shadow-md rounded-xl flex flex-col md:flex-row items-center p-6 hover:shadow-xl transition duration-300 w-full"
+          >
+            <img
+              src={user.photoUrl || "/default-avatar.png"}
+              alt={user.firstName || "User"}
+              className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+            />
 
-          return (
-            <div
-              key={connection._id}
-              className="bg-white shadow-md rounded-xl flex items-center p-6 hover:shadow-xl transition duration-300 w-full"
-            >
-              <img
-                src={user.photoUrl}
-                alt={user.firstName}
-                className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
-              />
+            <div className="mt-4 md:mt-0 md:ml-6 flex-1 text-center md:text-left">
+              <h2 className="text-xl font-semibold">
+                {user.firstName || "N/A"} {user.lastName || ""}
+              </h2>
 
-              <div className="ml-6 flex-1">
-                <h2 className="text-xl font-semibold">
-                  {user.firstName} {user.lastName}
-                </h2>
-                {user.about && (
-                  <p className="text-gray-600 text-sm mt-1">{user.about}</p>
-                )}
-                {user.age && (
-                  <p className="text-gray-500 text-sm mt-1">
-                    Age: {user.age} | {user.gender}
-                  </p>
-                )}
+              {user.about && (
+                <p className="text-gray-600 text-sm mt-1">{user.about}</p>
+              )}
 
-                {user.skills?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {user.skills.map((skill, i) => (
-                      <span
-                        key={i}
-                        className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                )}
+              {user.age && (
+                <p className="text-gray-500 text-sm mt-1">
+                  Age: {user.age} | {user.gender || "N/A"}
+                </p>
+              )}
+
+              {user.skills?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
+                  {user.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-4">
+                <Link to={"/chat/" + user._id}>
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                    Chat
+                  </button>
+                </Link>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
