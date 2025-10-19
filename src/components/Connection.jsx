@@ -17,6 +17,7 @@ const Connections = () => {
           withCredentials: true,
         });
         // Make sure we always get an array
+        console.log("Connections API response:", res.data); 
         dispatch(addConnections(Array.isArray(res.data.data) ? res.data.data : []));
       } catch (err) {
         console.log(err.message);
