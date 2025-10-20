@@ -43,7 +43,7 @@ npm run dev
 ```
 
 Your app will be live at:
-👉 **[http://localhost:5173](byteflame.in/)**
+👉 **byteflame.in/(byteflame.in/)**
 
 ---
 
