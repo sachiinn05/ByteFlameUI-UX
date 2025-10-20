@@ -6,7 +6,8 @@ import { addConnections } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
 
 const Connections = () => {
-  const connections = useSelector((store) => store.connection) || [];
+const connections = useSelector((store) => store.connections) || [];
+
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 

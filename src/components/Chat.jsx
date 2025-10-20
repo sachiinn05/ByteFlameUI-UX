@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
@@ -10,13 +10,13 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [targetUser, setTargetUser] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState(null); // ✅ Store single socket
   const user = useSelector((store) => store.user);
   const userId = user?._id;
   const messagesEndRef = useRef(null);
 
-  // ✅ useCallback to prevent re-creation on every render
-  const fetchChatMessages = useCallback(async () => {
+  // Fetch chat messages
+  const fetchChatMessages = async () => {
     try {
       const chat = await axios.get(`${BASE_URL}/chat/${targetUserId}`, {
         withCredentials: true,
@@ -34,9 +34,10 @@ const Chat = () => {
     } catch (error) {
       console.error("Error fetching chat messages:", error);
     }
-  }, [targetUserId]);
+  };
 
-  const fetchTargetUser = useCallback(async () => {
+  // Fetch target user info
+  const fetchTargetUser = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/user/connections`, {
         withCredentials: true,
@@ -47,11 +48,11 @@ const Chat = () => {
     } catch (err) {
       console.error("Error fetching target user:", err);
     }
-  }, [targetUserId]);
+  };
 
-  // ✅ Initialize socket connection safely
+  // Initialize socket only once
   useEffect(() => {
-    if (!userId || !user?.firstName) return;
+    if (!userId) return;
 
     const newSocket = createSocketConnection();
     setSocket(newSocket);
@@ -66,22 +67,15 @@ const Chat = () => {
       setMessages((prev) => [...prev, { firstName, lastName, text }]);
     });
 
-    return () => {
-      newSocket.off("messageReceived");
-      newSocket.disconnect();
-    };
-  }, [userId, user?.firstName, targetUserId]);
+    return () => newSocket.disconnect();
+  }, [userId, targetUserId]);
 
-  // ✅ Fetch messages + user info
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchChatMessages();
-      await fetchTargetUser();
-    };
-    fetchData();
-  }, [fetchChatMessages, fetchTargetUser]);
+    fetchChatMessages();
+    fetchTargetUser();
+  }, []);
 
-  // ✅ Send message
+  // Send message through existing socket
   const sendMessage = () => {
     if (!newMessage.trim() || !socket) return;
 
@@ -93,10 +87,15 @@ const Chat = () => {
       text: newMessage,
     });
 
+    // Add locally to UI immediately
+    // setMessages((prev) => [
+    //   ...prev,
+    //   { firstName: user.firstName, lastName: user.lastName, text: newMessage },
+    // ]);
     setNewMessage("");
   };
 
-  // ✅ Auto scroll
+  // Auto scroll to bottom when new message comes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -130,7 +129,7 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Chat Messages */}
       <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-gray-950/40 backdrop-blur-sm">
         {messages.length === 0 ? (
           <p className="text-center text-gray-500 mt-10">
@@ -146,6 +145,7 @@ const Chat = () => {
                   isOwn ? "justify-end" : "justify-start"
                 }`}
               >
+                {/* Target user's photo beside their messages */}
                 {!isOwn && (
                   <div className="avatar mr-2">
                     <div className="w-8 h-8 rounded-full overflow-hidden">
@@ -161,6 +161,7 @@ const Chat = () => {
                   </div>
                 )}
 
+                {/* Message bubble */}
                 <div
                   className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-md text-sm ${
                     isOwn
@@ -177,7 +178,7 @@ const Chat = () => {
         <div ref={messagesEndRef}></div>
       </div>
 
-      {/* Input */}
+      {/* Input Box */}
       <div className="p-4 border-t border-gray-700 bg-gray-900/60 backdrop-blur-lg flex items-center gap-3">
         <input
           value={newMessage}
