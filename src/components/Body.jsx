@@ -32,39 +32,33 @@ const Body = () => {
   }, [dispatch, navigate, userData]);
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background:
-          "linear-gradient(135deg, #ff6f91, #ff9671, #ffc75f, #f9f871)",
-      }}
-    >
-  
-      <NavBar />
+  <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#020617] via-[#0f172a] to-black">
 
-   
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          paddingTop: "4.5rem", 
-          paddingBottom: "100px", 
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "start",
-          gap: "1rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <Outlet />
+  
+    <NavBar />
+
+  
+    <main className="flex-1 pt-20 pb-24 px-4 md:px-6 lg:px-10 relative">
+
+      
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-100px] left-[10%] w-[300px] h-[300px] bg-pink-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-100px] right-[10%] w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl"></div>
       </div>
 
-    
-      <Footer />
-    </div>
-  );
+      <div className="relative max-w-6xl mx-auto w-full">
+
+        
+        
+            <Outlet />
+         
+      </div>
+    </main>
+
+
+    <Footer />
+  </div>
+);
 };
 
 export default Body;

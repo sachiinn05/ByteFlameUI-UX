@@ -1,21 +1,24 @@
-import axios from 'axios';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addUser } from '../utils/userSlice';
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../utils/constants';
+import axios from "axios";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../utils/constants";
 
 const AuthForm = () => {
-  const [isLogin, setIsLogin] = useState(true); // toggle between login/signup
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [emailId, setEmailId] = useState('');
-  const [password, setPassword] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const inputClass =
+    "w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 transition";
 
   const handleLogin = async () => {
     try {
@@ -25,9 +28,9 @@ const AuthForm = () => {
         { withCredentials: true }
       );
       dispatch(addUser(res.data));
-      navigate('/');
+      navigate("/feed");
     } catch (err) {
-      setError(err?.response?.data || 'Something went wrong');
+      setError(err?.response?.data || "Something went wrong");
     }
   };
 
@@ -39,9 +42,9 @@ const AuthForm = () => {
         { withCredentials: true }
       );
       dispatch(addUser(res.data.data));
-      navigate('/profile');
+      navigate("/profile");
     } catch (err) {
-      setError(err?.response?.data || 'Something went wrong');
+      setError(err?.response?.data || "Something went wrong");
     }
   };
 
@@ -52,84 +55,99 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="flex justify-center my-20">
-      <fieldset className="fieldset bg-white/90 border border-gray-200 rounded-2xl shadow-2xl w-[350px] p-6 backdrop-blur">
-        <legend className="fieldset-legend text-2xl font-bold text-center text-gray-800 mb-6">
-          {isLogin ? 'Login' : 'Sign Up'}
-        </legend>
+    <div className="min-h-screen flex items-center justify-center px-4 
+      bg-gradient-to-br from-[#020617] via-[#0f172a] to-black">
 
+      {/* ✨ Glow Background */}
+      <div className="absolute top-[-100px] left-[10%] w-[300px] h-[300px] bg-pink-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-[-100px] right-[10%] w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl"></div>
+
+      {/* 🔥 Form Card */}
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-md bg-white/5 backdrop-blur-xl 
+        border border-white/10 rounded-3xl shadow-2xl p-8"
+      >
+        {/* Title */}
+        <h2 className="text-3xl font-bold text-white text-center mb-6">
+          {isLogin ? "Welcome Back 👋" : "Create Account 🚀"}
+        </h2>
+
+        {/* Signup fields */}
         {!isLogin && (
-          <>
-            <label className="label font-medium text-gray-700">First Name</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <input
               type="text"
+              placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="input input-bordered w-full focus:ring-2 focus:ring-blue-500 mb-2"
-              placeholder="Enter first name"
+              className={inputClass}
             />
-            <label className="label font-medium text-gray-700">Last Name</label>
             <input
               type="text"
+              placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="input input-bordered w-full focus:ring-2 focus:ring-blue-500 mb-2"
-              placeholder="Enter last name"
+              className={inputClass}
             />
-          </>
+          </div>
         )}
 
-        <label className="label font-medium text-gray-700">Email</label>
+        {/* Email */}
         <input
           type="email"
+          placeholder="Email"
           value={emailId}
           onChange={(e) => setEmailId(e.target.value)}
-          className="input input-bordered w-full focus:ring-2 focus:ring-blue-500 mb-2"
-          placeholder="Enter your email"
+          className={`${inputClass} mb-4`}
         />
 
-        <label className="label font-medium text-gray-700 mt-3">Password</label>
-        <div className="relative w-full">
+        {/* Password */}
+        <div className="relative mb-4">
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="input input-bordered w-full focus:ring-2 focus:ring-pink-500 pr-12"
-            placeholder="Enter your password"
+            className={`${inputClass} pr-12`}
           />
           <button
             type="button"
-            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
             onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-2.5 text-gray-400 hover:text-white"
           >
-            {showPassword ? '🙈' : '👁️'}
+            {showPassword ? "🙈" : "👁️"}
           </button>
         </div>
 
-        {/* Error Message */}
+        {/* Error */}
         {error && (
-          <div className="mt-3 p-2 rounded-lg text-sm font-semibold bg-red-100 text-red-700 border border-red-300 animate-pulse">
+          <div className="mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-2 rounded-lg">
             ⚠️ {error}
           </div>
         )}
 
+        {/* Submit */}
         <button
-          onClick={handleSubmit}
-          className="btn w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-purple-500 hover:to-pink-500 shadow-md"
+          type="submit"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 
+          text-white font-semibold shadow-lg hover:scale-[1.02] transition"
         >
-          {isLogin ? 'Login' : 'Sign Up'}
+          {isLogin ? "Login" : "Sign Up"}
         </button>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          {isLogin ? "Don’t have an account?" : 'Already have an account?'}{' '}
+        {/* Toggle */}
+        <p className="text-center text-sm text-gray-400 mt-5">
+          {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
           <button
+            type="button"
             onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:underline"
+            className="text-pink-400 hover:underline"
           >
-            {isLogin ? 'Sign up' : 'Login'}
+            {isLogin ? "Sign up" : "Login"}
           </button>
         </p>
-      </fieldset>
+      </form>
     </div>
   );
 };

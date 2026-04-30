@@ -11,27 +11,37 @@ const Feed = () => {
 
   useEffect(() => {
     const getFeed = async () => {
-      if (feed) return; // already have feed
+    
+      if (feed && feed.length > 0) return;
+
       try {
         const res = await axios.get(BASE_URL + "/feed", {
           withCredentials: true,
         });
+
+        console.log("Feed API Response:", res.data); // 🔍 debug
         dispatch(addFeed(res.data));
       } catch (err) {
-        console.log(err);
+        console.log("Feed Error:", err);
       }
     };
 
     getFeed();
-  }, [dispatch, feed]); 
+  }, [dispatch, feed]);
 
-if (!feed || feed.length === 0) 
-  return (
-    <h1 className="text-2xl font-bold text-center text-gray-500 mt-10">
-      No  new user found
-    </h1>
-  );
+ 
+  if (!feed) {
+    return <h1 className="text-center mt-10">Loading...</h1>;
+  }
 
+
+  if (feed.length === 0) {
+    return (
+      <h1 className="text-2xl font-bold text-center text-gray-500 mt-10">
+        No new users found
+      </h1>
+    );
+  }
 
   return (
     <div className="flex justify-center mt-8">

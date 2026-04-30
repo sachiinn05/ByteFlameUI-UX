@@ -15,7 +15,7 @@ const Chat = () => {
   const userId = user?._id;
   const messagesEndRef = useRef(null);
 
-  // Fetch chat messages
+
   const fetchChatMessages = async () => {
     try {
       const chat = await axios.get(`${BASE_URL}/chat/${targetUserId}`, {
@@ -36,7 +36,7 @@ const Chat = () => {
     }
   };
 
-  // Fetch target user info
+ 
   const fetchTargetUser = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/user/connections`, {
@@ -50,7 +50,7 @@ const Chat = () => {
     }
   };
 
-  // Initialize socket only once
+
   useEffect(() => {
     if (!userId) return;
 
@@ -75,7 +75,7 @@ const Chat = () => {
     fetchTargetUser();
   }, []);
 
-  // Send message through existing socket
+ 
   const sendMessage = () => {
     if (!newMessage.trim() || !socket) return;
 
@@ -87,115 +87,104 @@ const Chat = () => {
       text: newMessage,
     });
 
-    // Add locally to UI immediately
-    // setMessages((prev) => [
-    //   ...prev,
-    //   { firstName: user.firstName, lastName: user.lastName, text: newMessage },
-    // ]);
+    
     setNewMessage("");
   };
 
-  // Auto scroll to bottom when new message comes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  return (
-    <div className="flex flex-col w-3/4 mx-auto mt-6 border border-gray-700 rounded-2xl bg-gradient-to-b from-gray-900 via-gray-950 to-black shadow-2xl h-[75vh] overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-700 flex items-center gap-3 bg-gray-800/70 backdrop-blur-md sticky top-0 z-10">
-        <div className="avatar">
-          <div className="w-12 h-12 rounded-full ring ring-secondary ring-offset-base-100 ring-offset-2 overflow-hidden">
-            <img
-              src={
-                targetUser?.photoUrl ||
-                `https://api.multiavatar.com/${targetUserId}.svg`
-              }
-              alt={targetUser?.firstName || "User"}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-        <div>
-          <h2 className="font-semibold text-white text-lg">
-            Chat with{" "}
-            <span className="text-secondary">
-              {targetUser
-                ? `${targetUser.firstName} ${targetUser.lastName || ""}`
-                : "Loading..."}
-            </span>
-          </h2>
-          <p className="text-xs text-gray-400">Online now 💬</p>
-        </div>
-      </div>
+return (
+  <div className="flex flex-col h-[85vh] max-w-5xl mx-auto mt-6 
+  rounded-3xl overflow-hidden 
+  bg-gradient-to-br from-[#020617] via-[#0f172a] to-black 
+  border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
 
-      {/* Chat Messages */}
-      <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-gray-950/40 backdrop-blur-sm">
-        {messages.length === 0 ? (
-          <p className="text-center text-gray-500 mt-10">
-            No messages yet. Start the conversation!
-          </p>
-        ) : (
-          messages.map((msg, index) => {
-            const isOwn = msg.firstName === user.firstName;
-            return (
-              <div
-                key={index}
-                className={`flex items-end ${
-                  isOwn ? "justify-end" : "justify-start"
-                }`}
-              >
-                {/* Target user's photo beside their messages */}
-                {!isOwn && (
-                  <div className="avatar mr-2">
-                    <div className="w-8 h-8 rounded-full overflow-hidden">
-                      <img
-                        src={
-                          targetUser?.photoUrl ||
-                          `https://api.multiavatar.com/${targetUserId}.svg`
-                        }
-                        alt={targetUser?.firstName || "User"}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
+  
+    <div className="flex items-center gap-4 px-5 py-4 
+    border-b border-white/10 bg-white/5 backdrop-blur-xl">
 
-                {/* Message bubble */}
-                <div
-                  className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-md text-sm ${
-                    isOwn
-                      ? "bg-gradient-to-r from-blue-600 to-blue-400 text-white"
-                      : "bg-gray-800 text-gray-200"
-                  }`}
-                >
-                  <p>{msg.text}</p>
-                </div>
-              </div>
-            );
-          })
-        )}
-        <div ref={messagesEndRef}></div>
-      </div>
+      <img
+        src={
+          targetUser?.photoUrl ||
+          `https://api.multiavatar.com/${targetUserId}.svg`
+        }
+        alt="user"
+        className="w-12 h-12 rounded-full object-cover border border-white/20"
+      />
 
-      {/* Input Box */}
-      <div className="p-4 border-t border-gray-700 bg-gray-900/60 backdrop-blur-lg flex items-center gap-3">
-        <input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          className="flex-1 px-4 py-2 rounded-xl bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          placeholder="Type your message..."
-        />
-        <button
-          onClick={sendMessage}
-          className="btn btn-secondary px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all"
-        >
-          Send 🚀
-        </button>
+      <div>
+        <h2 className="text-white font-semibold text-lg">
+          {targetUser
+            ? `${targetUser.firstName} ${targetUser.lastName || ""}`
+            : "Loading..."}
+        </h2>
+        <p className="text-xs text-green-400">● Online</p>
       </div>
     </div>
-  );
+
+   
+    <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+
+      {messages.length === 0 ? (
+        <p className="text-center text-gray-500 mt-10">
+          Start the conversation 🚀
+        </p>
+      ) : (
+        messages.map((msg, index) => {
+          const isOwn = msg.firstName === user.firstName;
+
+          return (
+            <div
+              key={index}
+              className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm 
+                shadow-lg backdrop-blur-md ${
+                  isOwn
+                    ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                    : "bg-white/10 text-gray-200 border border-white/10"
+                }`}
+              >
+                {msg.text}
+              </div>
+            </div>
+          );
+        })
+      )}
+
+      <div ref={messagesEndRef}></div>
+    </div>
+
+  
+    <div className="flex items-center gap-3 p-4 
+    border-t border-white/10 bg-white/5 backdrop-blur-xl">
+
+      <input
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+        placeholder="Type a message..."
+        className="flex-1 px-4 py-2 rounded-xl 
+        bg-white/10 border border-white/10 
+        text-white placeholder-gray-400 
+        focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+      />
+
+      <button
+        onClick={sendMessage}
+        className="px-5 py-2 rounded-xl 
+        bg-gradient-to-r from-pink-500 to-purple-500 
+        text-white font-medium shadow-lg 
+        hover:scale-105 transition"
+      >
+        Send
+      </button>
+    </div>
+  </div>
+);
 };
 
 export default Chat;
