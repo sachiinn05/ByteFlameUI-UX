@@ -5,10 +5,7 @@ let socket = null;
 
 export const getSocket = () => {
   if (!socket) {
-    socket =
-      location.hostname === "localhost"
-        ? io(BASE_URL, { withCredentials: true })
-        : io("/", { path: "/api/socket.io", withCredentials: true });
+    socket = io(BASE_URL || "/", { withCredentials: true });
   }
   return socket;
 };
