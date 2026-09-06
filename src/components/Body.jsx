@@ -5,6 +5,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import PresenceListener from "./PresenceListener";
 import { useEffect } from "react";
 
 const Body = () => {
@@ -36,9 +37,10 @@ const Body = () => {
 
   
     <NavBar />
+    <PresenceListener />
 
   
-    <main className="flex-1 pt-20 pb-24 px-4 md:px-6 lg:px-10 relative">
+    <main className="flex-1 pt-24 pb-8 px-4 md:px-6 lg:px-10 relative">
 
       
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

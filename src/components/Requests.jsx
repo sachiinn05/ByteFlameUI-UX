@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, resolvePhotoUrl } from "../utils/constants";
 import { addRequests } from "../utils/requestSlice";
 
 const Requests = () => {
@@ -39,14 +39,20 @@ const Requests = () => {
     fetchRequests();
   }, [fetchRequests]); 
 
-  if (!requests) return <h1 className="text-center mt-24">Loading...</h1>;
+  if (!requests)
+    return (
+      <p className="text-center mt-24 text-gray-400 animate-pulse">Loading requests...</p>
+    );
 
   if (requests.length === 0)
     return (
-      <div className="flex justify-center items-center mt-24">
-        <h1 className="text-2xl font-semibold text-gray-600">
-          No Requests Found
-        </h1>
+      <div className="flex justify-center mt-16">
+        <div className="max-w-md w-full bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
+          <h1 className="text-2xl font-semibold text-white">No requests yet</h1>
+          <p className="text-gray-400 text-sm mt-2">
+            When someone likes you, you can accept or ignore them here.
+          </p>
+        </div>
       </div>
     );
 
@@ -54,9 +60,10 @@ const Requests = () => {
   <div className="w-full px-4 md:px-6 lg:px-10 mt-10">
 
    
-    <h1 className="text-3xl md:text-4xl font-bold text-white mb-10 text-center">
+    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 text-center">
       Requests
     </h1>
+    <p className="text-center text-gray-400 text-sm mb-10">People who liked you</p>
 
   
     {!requests && (
@@ -95,7 +102,7 @@ const Requests = () => {
           
             <div className="relative">
               <img
-                src={user.photoUrl}
+                src={resolvePhotoUrl(user.photoUrl)}
                 alt={user.firstName}
                 className="w-20 h-20 rounded-full object-cover border-2 border-white/20"
               />

@@ -55,7 +55,7 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden
       bg-gradient-to-br from-[#020617] via-[#0f172a] to-black">
 
       {/* ✨ Glow Background */}
@@ -69,11 +69,12 @@ const AuthForm = () => {
         border border-white/10 rounded-3xl shadow-2xl p-8"
       >
         {/* Title */}
-        <h2 className="text-3xl font-bold text-white text-center mb-6">
-          {isLogin ? "Welcome Back 👋" : "Create Account 🚀"}
+        <h2 className="text-3xl font-bold text-white text-center">
+          {isLogin ? "Welcome back" : "Create account"}
         </h2>
-
-        {/* Signup fields */}
+        <p className="text-center text-gray-400 text-sm mt-2 mb-6">
+          {isLogin ? "Sign in to keep matching" : "Create your profile in a minute"}
+        </p>
         {!isLogin && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <input

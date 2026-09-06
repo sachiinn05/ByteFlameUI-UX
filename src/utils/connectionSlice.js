@@ -6,13 +6,16 @@ const connectionSlice = createSlice({
   initialState: [], // ✅ should always be an array
   reducers: {
     addConnections: (state, action) => {
-      return action.payload || []; // replace state with latest data
+      return action.payload || [];
+    },
+    removeConnection: (state, action) => {
+      return state.filter((user) => user._id !== action.payload);
     },
     removeConnections: () => {
-      return []; // reset to empty list
+      return [];
     },
   },
 });
 
-export const { addConnections, removeConnections } = connectionSlice.actions;
+export const { addConnections, removeConnection, removeConnections } = connectionSlice.actions;
 export default connectionSlice.reducer;

@@ -21,7 +21,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
 
-          {/* 🔐 App Layout (NO PATH HERE) */}
+         
           <Route element={<Body />}>
             <Route path="/feed" element={<Feed />} />
             <Route path="/profile" element={<Profile />} />
