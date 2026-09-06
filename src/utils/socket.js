@@ -5,7 +5,10 @@ let socket = null;
 
 export const getSocket = () => {
   if (!socket) {
-    socket = io(BASE_URL || "/", { withCredentials: true });
+    socket = io(BASE_URL || "https://byteflame-backend.onrender.com", {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
   }
   return socket;
 };
