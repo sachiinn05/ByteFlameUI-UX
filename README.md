@@ -1,198 +1,66 @@
-# ⚡ ByteFlame
+# ByteFlame UI
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge\&logo=google-chrome)](https://byteflame.in)
-[![Status](https://img.shields.io/website?url=https%3A%2F%2Fbyteflame.in\&up_message=Online\&down_message=Offline\&style=for-the-badge\&logo=amazon-aws)](https://byteflame.in)
-[![Hosted on AWS EC2](https://img.shields.io/badge/Hosted%20on-AWS%20EC2-orange?style=for-the-badge\&logo=amazon-ec2)](https://aws.amazon.com/ec2/)
-[![DNS by Cloudflare](https://img.shields.io/badge/DNS-Cloudflare-f38020?style=for-the-badge\&logo=cloudflare)](https://www.cloudflare.com/)
+Dating app frontend — match by interests, chat in real time, block or unmatch.
 
-A modern **React.js** web application built with **Vite**, **Tailwind CSS (CDN)**, and **Redux Toolkit** — hosted on **AWS EC2** and secured with **Cloudflare DNS**.
-ByteFlame is designed for high performance, real-time communication, and clean, modular UI.
+[![Live App](https://img.shields.io/badge/Live-App-brightgreen)](https://byte-flame-ui-ux.vercel.app)
+[![Frontend](https://img.shields.io/badge/GitHub-Frontend-181717?logo=github)](https://github.com/sachiinn05/devTinderUI)
+[![Backend](https://img.shields.io/badge/GitHub-Backend-181717?logo=github)](https://github.com/sachiinn05/dev_tinder)
 
----
+## Live links
 
-## 🌐 Live Website
+| | URL |
+|---|---|
+| **App** | [https://byte-flame-ui-ux.vercel.app](https://byte-flame-ui-ux.vercel.app) |
+| **API** | [https://byteflame-backend.onrender.com](https://byteflame-backend.onrender.com) |
+| **Frontend repo** | [github.com/sachiinn05/devTinderUI](https://github.com/sachiinn05/devTinderUI) |
+| **Backend repo** | [github.com/sachiinn05/dev_tinder](https://github.com/sachiinn05/dev_tinder) |
 
-👉 **[https://byteflame.in](https://byteflame.in)**
+> Free Render sleeps after idle time. The first request can take ~1 minute.
 
----
+## Features
 
-## 🚀 Tech Stack
+- Login / signup (JWT cookies)
+- Discover feed ranked by **shared interests** (filters + pagination)
+- Profile photo upload
+- Connection requests
+- Real-time chat (Socket.io) with online status, typing, unread count
+- Unmatch and block
+- Responsive dark UI (React + Tailwind)
 
-**Frontend**
+## Tech stack
 
-* React.js (Vite)
-* Tailwind CSS (CDN)
-* Redux Toolkit
-* React Router DOM
-* Axios
-* Material UI (MUI)
-* React Toastify
-* Socket.io Client
-* React Icons
+React (Vite) · Redux Toolkit · React Router · Axios · Tailwind CSS · Socket.io Client · Vercel
 
-**Hosting & Infrastructure**
-
-* AWS EC2 (Ubuntu Instance)
-* Cloudflare (SSL + DNS Management)
-* Nginx Reverse Proxy 
-* PM2 
-
----
-
-## 🧠 Project Overview
-
-ByteFlame is a responsive and interactive web application with features such as:
-
-* 🔐 Authentication (Login & Signup)
-* 💬 Real-time chat using Socket.io
-* 🧾 Dynamic feed and user connections
-* 🧩 Modular architecture for scalability
-* 🌙 Styled with Tailwind CSS for modern UI
-* ⚡ Fast build using Vite
-
----
-
-## 📦 Project Setup
-
-### 1️⃣ Clone the Repository
+## Local setup
 
 ```bash
-git clone https://github.com/sachiinn05/byteflame.git
-cd byteflame
-```
-
-### 2️⃣ Install Dependencies
-
-```bash
+git clone https://github.com/sachiinn05/devTinderUI.git
+cd devTinderUI
 npm install
 ```
 
-### 3️⃣ Run the Development Server
+Create `.env`:
+
+```env
+VITE_BASE_URL=http://localhost:9000
+```
 
 ```bash
 npm run dev
 ```
 
-Your app will be live at
-👉 **[http://localhost:5173](http://localhost:5173)**
+App: [http://localhost:5173](http://localhost:5173)  
+Backend must be running on port **9000**.
 
----
+## Production
 
-## ⚙️ Environment Variables
+Hosted on **Vercel**. Set:
 
-Create a `.env` file in the root directory and add:
-
-```
-VITE_BASE_URL = your_backend_api_url
+```env
+VITE_BASE_URL=https://byteflame-backend.onrender.com
 ```
 
----
+## Author
 
-## ☁️ Deployment on AWS EC2
-
-1. **Launch an EC2 instance**
-
-   * Ubuntu 22.04 (recommended)
-   * Allow ports: 22 (SSH), 80 (HTTP), 443 (HTTPS)
-
-2. **Install Node.js & Nginx**
-
-   ```bash
-   sudo apt update
-   sudo apt install nodejs npm nginx -y
-   ```
-
-3. **Clone your repo on EC2**
-
-   ```bash
-   git clone https://github.com/sachiinn05/byteflame.git
-   cd byteflame
-   npm install
-   npm run build
-   ```
-
-4. **Serve build using Nginx**
-
-   ```bash
-   sudo cp -r dist/* /var/www/html/
-   sudo systemctl restart nginx
-   ```
-
-5. **Connect Domain via Cloudflare**
-
-   * Add an **A record** in Cloudflare pointing `byteflame.in` → EC2 public IP
-   * Enable **proxy mode** (orange cloud)
-   * Turn on **SSL → Full mode**
-
----
-
-## 🧱 Folder Structure
-
-```
-byteflame/
-├── public/
-│   └── logo.jpg
-├── src/
-│   ├── components/
-│   │   ├── Body.jsx
-│   │   ├── Chat.jsx
-│   │   ├── Connection.jsx
-│   │   ├── Feed.jsx
-│   │   ├── Login.jsx
-│   │   ├── NavBar.jsx
-│   │   ├── Profile.jsx
-│   │   ├── Requests.jsx
-│   │   └── UserCard.jsx
-│   ├── utils/
-│   │   ├── appStore.js
-│   │   ├── constants.js
-│   │   ├── connectionSlice.js
-│   │   ├── feedSlice.js
-│   │   ├── requestSlice.js
-│   │   ├── socket.js
-│   │   └── userSlice.js
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-├── package.json
-└── vite.config.js
-```
-
----
-
-## 💻 Scripts
-
-| Command           | Description              |
-| ----------------- | ------------------------ |
-| `npm run dev`     | Start development server |
-| `npm run build`   | Build production files   |
-| `npm run preview` | Preview production build |
-| `npm run lint`    | Run ESLint               |
-
----
-
-
----
-
-## 🧑‍💻 Author
-
-**Sachin Singh**
-🔗 [GitHub Profile](https://github.com/sachiinn05)
-
----
-
-## 🌟 Contribute
-
-Contributions are welcome!
-If you find a bug or want to improve this project:
-
-1. Fork this repository
-2. Create a feature branch
-3. Commit your changes
-4. Submit a Pull Request
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License**.
+**Sachin Singh**  
+[GitHub](https://github.com/sachiinn05)
