@@ -17,13 +17,12 @@ const EditProfile = ({ user }) => {
   const [about, setAbout] = useState(user.about);
   const [skills, setSkills] = useState(user.skills || []);
   const [showPreview, setShowPreview] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const dispatch = useDispatch();
 
-  const inputClass =
-    "w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 transition";
-
   const saveProfile = async () => {
+    setSaving(true);
     try {
       let uploadedPhotoUrl = photoUrl;
 
@@ -57,10 +56,12 @@ const EditProfile = ({ user }) => {
         { withCredentials: true }
       );
       dispatch(addUser(res?.data?.data));
-      toast.success("Profile saved successfully 🎉");
+      toast.success("Profile saved");
     } catch (err) {
       console.log(err);
-      toast.error(err?.response?.data?.message || "Failed to save profile ❌");
+      toast.error(err?.response?.data?.message || "Failed to save profile");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -73,67 +74,53 @@ const EditProfile = ({ user }) => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col gap-6">
+    <div className="w-full max-w-2xl mx-auto surface-card p-5 md:p-8 flex flex-col gap-5">
+      <div>
+        <h1 className="page-title">Profile</h1>
+        <p className="page-sub">Your photo and interests help others find you</p>
+      </div>
 
-     
-      <h2 className="text-2xl font-semibold text-white">Edit profile</h2>
-      <p className="text-gray-400 text-sm -mt-4">
-        Your photo and interests help others find you
-      </p>
-
-    
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <input
           type="text"
-          placeholder="First Name"
+          placeholder="First name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className={inputClass}
+          className="input-field"
         />
-
         <input
           type="text"
-          placeholder="Last Name"
+          placeholder="Last name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          className={inputClass}
+          className="input-field"
         />
-
         <input
           type="number"
           placeholder="Age"
           value={age}
           onChange={(e) => setAge(e.target.value)}
-          className={inputClass}
+          className="input-field"
         />
-
-        <select
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-          className={`${inputClass} bg-[#0b1220]`}
-        >
-          <option value="">Select Gender</option>
+        <select value={gender} onChange={(e) => setGender(e.target.value)} className="input-field">
+          <option value="">Select gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
           <option value="others">Others</option>
         </select>
       </div>
 
-    
       <div className="flex flex-col gap-3">
-        <label className="text-sm text-gray-400">Profile Photo</label>
-
+        <label className="text-sm text-zinc-400">Photo</label>
         {photoUrl && (
           <img
             src={resolvePhotoUrl(photoUrl)}
-            alt="Preview"
-            className="w-24 h-24 rounded-full object-cover border border-white/20"
+            alt=""
+            className="w-20 h-20 rounded-xl object-cover border border-zinc-800"
           />
         )}
-
-        <label className="cursor-pointer inline-flex items-center justify-center w-fit px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-pink-300 text-sm hover:bg-white/20 transition">
-          Choose photo from computer
+        <label className="btn-secondary w-fit cursor-pointer">
+          Choose photo
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
@@ -141,93 +128,71 @@ const EditProfile = ({ user }) => {
             className="hidden"
           />
         </label>
-        {photoFile && (
-          <p className="text-xs text-gray-400">{photoFile.name} — click Save to upload</p>
-        )}
+        {photoFile && <p className="text-xs text-zinc-500">{photoFile.name} — click Save to upload</p>}
       </div>
 
       <div>
-        <label className="text-sm text-gray-400">About</label>
+        <label className="text-sm text-zinc-400">About</label>
         <textarea
           value={about}
           onChange={(e) => setAbout(e.target.value)}
-          placeholder="Write something about yourself..."
-          className={`${inputClass} h-28 resize-none`}
+          placeholder="A short intro"
+          className="input-field mt-1 min-h-28 resize-none"
         />
       </div>
 
-    
       <div>
-        <label className="text-sm text-gray-400">Interests</label>
-
+        <label className="text-sm text-zinc-400">Interests</label>
         <input
           type="text"
           value={skills.join(", ")}
           onChange={(e) => setSkills(e.target.value.split(","))}
-          placeholder="Travel, music, gym, cooking..."
-          className={inputClass}
+          placeholder="Travel, music, gym…"
+          className="input-field mt-1"
         />
-
-        {/* Interests Preview */}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {skills.map((skill, i) => (
-            <span
-              key={i}
-              className="px-3 py-1 text-xs bg-white/10 text-gray-200 rounded-full border border-white/10"
-            >
-              {skill.trim()}
-            </span>
-          ))}
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {skills.map((skill, i) =>
+            skill.trim() ? (
+              <span key={i} className="px-2 py-0.5 text-xs border border-zinc-800 text-zinc-400 rounded-md">
+                {skill.trim()}
+              </span>
+            ) : null
+          )}
         </div>
       </div>
 
-    
-      <div className="flex gap-4">
-
-      
-        <button
-          onClick={() => setShowPreview(true)}
-          className="w-1/2 py-3 rounded-xl bg-white/10 border border-white/10 
-          text-white font-medium hover:bg-white/20 transition"
-        >
-          View Profile
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button type="button" onClick={() => setShowPreview(true)} className="btn-secondary flex-1">
+          Preview
         </button>
-
-        
-        <button
-          onClick={saveProfile}
-          className="w-1/2 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 
-          text-white font-semibold shadow-lg hover:scale-[1.02] transition"
-        >
-          Save
+        <button type="button" onClick={saveProfile} disabled={saving} className="btn-primary flex-1">
+          {saving ? "Saving…" : "Save"}
         </button>
-
       </div>
 
-      {/* 🔥 Profile Preview Modal */}
       {showPreview && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
-
-          <div className="relative">
-
-          
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setShowPreview(false)}
+        >
+          <div className="relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <button
+              type="button"
               onClick={() => setShowPreview(false)}
-              className="absolute -top-4 -right-4 bg-white text-black w-8 h-8 rounded-full shadow-lg"
+              className="absolute -top-2 right-0 z-10 btn-secondary min-h-10"
             >
-              ✕
+              Close
             </button>
-
-          
             <UserCard
               user={{ firstName, lastName, age, photoUrl, gender, skills, about }}
             />
-
           </div>
         </div>
       )}
 
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
     </div>
   );
 };

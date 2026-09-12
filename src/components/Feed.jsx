@@ -56,12 +56,7 @@ const Feed = () => {
   }, [feed.page, applied, fetchFeed]);
 
   useEffect(() => {
-    if (
-      feed.page > 0 &&
-      feed.users.length === 0 &&
-      feed.hasMore &&
-      !loading
-    ) {
+    if (feed.page > 0 && feed.users.length === 0 && feed.hasMore && !loading) {
       fetchFeed({ page: feed.page + 1, replace: false, activeFilters: applied });
     }
   }, [feed.users.length, feed.hasMore, feed.page, loading, applied, fetchFeed]);
@@ -80,25 +75,26 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="text-center">
-        <h1 className="text-2xl md:text-3xl font-bold text-white">Discover</h1>
-        <p className="text-gray-400 text-sm mt-1">People ranked by shared interests</p>
+      <div className="text-center max-w-lg">
+        <h1 className="page-title">Discover</h1>
+        <p className="page-sub">People ranked by overlapping interests</p>
       </div>
+
       <form
         onSubmit={applyFilters}
-        className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-white/5 border border-white/10 rounded-2xl p-4"
+        className="w-full surface-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3"
       >
         <input
           type="text"
           placeholder="Interest (e.g. music)"
           value={filters.interest}
           onChange={(e) => setFilters((f) => ({ ...f, interest: e.target.value }))}
-          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="input-field"
         />
         <select
           value={filters.gender}
           onChange={(e) => setFilters((f) => ({ ...f, gender: e.target.value }))}
-          className="px-3 py-2 rounded-xl bg-[#0b1220] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="input-field"
         >
           <option value="">Any gender</option>
           <option value="male">Male</option>
@@ -111,7 +107,7 @@ const Feed = () => {
           placeholder="Min age"
           value={filters.minAge}
           onChange={(e) => setFilters((f) => ({ ...f, minAge: e.target.value }))}
-          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="input-field"
         />
         <input
           type="number"
@@ -119,49 +115,40 @@ const Feed = () => {
           placeholder="Max age"
           value={filters.maxAge}
           onChange={(e) => setFilters((f) => ({ ...f, maxAge: e.target.value }))}
-          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="input-field"
         />
         <div className="flex gap-2">
-          <button
-            type="submit"
-            className="flex-1 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium"
-          >
+          <button type="submit" className="btn-primary flex-1">
             Filter
           </button>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 text-white text-sm"
-          >
+          <button type="button" onClick={clearFilters} className="btn-secondary">
             Reset
           </button>
         </div>
       </form>
 
       {feed.total > 0 && (
-        <p className="text-sm text-gray-400">
-          Ranked by shared interests · {feed.total} people
-        </p>
+        <p className="text-sm text-zinc-500">{feed.total} people</p>
       )}
 
       {loading && feed.users.length === 0 && (
-        <div className="mt-16 text-center">
-          <div className="w-80 h-[28rem] rounded-3xl bg-white/5 border border-white/10 animate-pulse" />
-          <p className="text-gray-400 mt-4 text-sm">Finding people for you...</p>
+        <div className="w-full max-w-md">
+          <div className="h-[28rem] rounded-2xl bg-zinc-900 border border-zinc-800 animate-pulse" />
+          <p className="text-zinc-500 mt-4 text-sm text-center">Finding people…</p>
         </div>
       )}
 
       {!loading && feed.users.length === 0 && (
-        <div className="mt-16 max-w-md text-center bg-white/5 border border-white/10 rounded-2xl p-10">
-          <h2 className="text-xl font-semibold text-white">No one new right now</h2>
-          <p className="text-gray-400 text-sm mt-2">
-            Try clearing filters, add more interests on your profile, or check back later.
+        <div className="w-full max-w-md surface-card p-8 text-center">
+          <h2 className="text-lg font-semibold">No one new right now</h2>
+          <p className="page-sub">
+            Clear filters, add more interests on your profile, or check back later.
           </p>
         </div>
       )}
 
       {feed.users[0] && (
-        <div className="flex justify-center">
+        <div className="w-full flex justify-center">
           <UserCard user={feed.users[0]} />
         </div>
       )}

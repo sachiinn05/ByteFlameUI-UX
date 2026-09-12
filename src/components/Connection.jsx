@@ -7,7 +7,7 @@ import { setUnreadBulk } from "../utils/presenceSlice";
 import { Link } from "react-router-dom";
 
 const Connections = () => {
-const connections = useSelector((store) => store.connections) || [];
+  const connections = useSelector((store) => store.connections) || [];
   const onlineUserIds = useSelector((store) => store.presence.onlineUserIds);
   const unreadByUserId = useSelector((store) => store.presence.unreadByUserId);
 
@@ -24,11 +24,7 @@ const connections = useSelector((store) => store.connections) || [];
     if (!ok) return;
     setBusyId(userId);
     try {
-      await axios.post(
-        `${BASE_URL}/request/${type}/${userId}`,
-        {},
-        { withCredentials: true }
-      );
+      await axios.post(`${BASE_URL}/request/${type}/${userId}`, {}, { withCredentials: true });
       dispatch(removeConnection(userId));
     } catch (err) {
       console.log(err.message);
@@ -43,8 +39,6 @@ const connections = useSelector((store) => store.connections) || [];
         const res = await axios.get(BASE_URL + "/user/connections", {
           withCredentials: true,
         });
-       
-        console.log("Connections API response:", res.data); 
         const list = Array.isArray(res.data.data) ? res.data.data : [];
         dispatch(addConnections(list));
         const unread = {};
@@ -54,7 +48,7 @@ const connections = useSelector((store) => store.connections) || [];
         dispatch(setUnreadBulk(unread));
       } catch (err) {
         console.log(err.message);
-        dispatch(addConnections([])); // fallback
+        dispatch(addConnections([]));
       } finally {
         setLoading(false);
       }
@@ -63,160 +57,115 @@ const connections = useSelector((store) => store.connections) || [];
     fetchConnections();
   }, [dispatch]);
 
-  if (loading)
+  if (loading) {
     return (
-      <p className="text-center mt-24 text-gray-400 animate-pulse">Loading matches...</p>
-    );
-
-  if (!connections || connections.length === 0)
-    return (
-      <div className="flex justify-center mt-16">
-        <div className="max-w-md w-full bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
-          <h1 className="text-2xl font-semibold text-white">No matches yet</h1>
-          <p className="text-gray-400 text-sm mt-2">
-            Like people on Discover. When they accept, they show up here.
-          </p>
-          <Link
-            to="/feed"
-            className="inline-block mt-6 px-6 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium"
-          >
-            Go to Discover
-          </Link>
+      <div>
+        <h1 className="page-title">Matches</h1>
+        <p className="page-sub">Chat, unmatch, or block anytime</p>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-36 rounded-2xl bg-zinc-900 border border-zinc-800 animate-pulse" />
+          <div className="h-36 rounded-2xl bg-zinc-900 border border-zinc-800 animate-pulse" />
         </div>
       </div>
     );
+  }
 
-return (
-  <div className="w-full px-4 md:px-6 lg:px-10 mt-10">
-
-  
-    <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-2">
-      Your matches
-    </h1>
-    <p className="text-center text-gray-400 text-sm mb-10">Chat, unmatch, or block anytime</p>
-
-   
-    {loading && (
-      <div className="flex justify-center mt-20">
-        <p className="text-gray-400 text-lg animate-pulse">Loading...</p>
+  if (!connections.length) {
+    return (
+      <div className="max-w-md mx-auto text-center surface-card p-8 mt-8">
+        <h1 className="text-lg font-semibold">No matches yet</h1>
+        <p className="page-sub">Like people on Discover. When they accept, they show up here.</p>
+        <Link to="/feed" className="btn-primary mt-6 inline-flex">
+          Go to Discover
+        </Link>
       </div>
-    )}
+    );
+  }
 
-  
-    {!loading && connections.length === 0 && (
-      <div className="flex justify-center mt-20">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-10 text-center">
-          <h2 className="text-xl text-gray-300 font-medium">
-            No Connections Yet 😴
-          </h2>
-          <p className="text-gray-500 text-sm mt-2">
-            Start connecting with people to see them here.
-          </p>
-        </div>
-      </div>
-    )}
+  return (
+    <div>
+      <h1 className="page-title">Matches</h1>
+      <p className="page-sub mb-8">Chat, unmatch, or block anytime</p>
 
-  
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {connections.map((user, idx) =>
-        user && user._id ? (
-          <div
-            key={user._id || idx}
-            className="group flex gap-5 items-center p-5 rounded-2xl 
-            bg-white/5 backdrop-blur-xl border border-white/10 
-            shadow-lg hover:shadow-2xl transition duration-300"
-          >
-
-           
-            <div className="relative">
-              <img
-                src={resolvePhotoUrl(user.photoUrl)}
-                alt={user.firstName || "User"}
-                className="w-20 h-20 rounded-full object-cover border border-white/20"
-              />
-              <span
-                className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-slate-900 ${
-                  onlineUserIds.includes(String(user._id))
-                    ? "bg-green-400"
-                    : "bg-gray-500"
-                }`}
-              />
-            </div>
-
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                {user.firstName || "N/A"} {user.lastName || ""}
-                {(unreadByUserId[String(user._id)] || 0) > 0 && (
-                  <span className="text-xs bg-pink-500 text-white px-2 py-0.5 rounded-full">
-                    {unreadByUserId[String(user._id)]}
-                  </span>
-                )}
-              </h2>
-              <p className="text-xs mt-0.5 text-gray-400">
-                {onlineUserIds.includes(String(user._id)) ? "Online" : "Offline"}
-              </p>
-
-              {user.about && (
-                <p className="text-gray-400 text-sm line-clamp-2 mt-1">
-                  {user.about}
-                </p>
-              )}
-
-              {user.age && (
-                <p className="text-gray-500 text-xs mt-1">
-                  {user.age} • {user.gender || "N/A"}
-                </p>
-              )}
-
-            
-              {user.skills?.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {user.skills.slice(0, 3).map((skill, sidx) => (
-                    <span
-                      key={sidx}
-                      className="text-xs px-3 py-1 rounded-full 
-                      bg-white/10 text-gray-200 border border-white/10"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-            
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Link to={"/chat/" + user._id}>
-                  <button
-                    className="px-4 py-2 rounded-full 
-                    bg-gradient-to-r from-pink-500 to-purple-500 
-                    text-white text-sm font-medium 
-                    hover:scale-105 transition"
-                  >
-                    Chat
-                  </button>
-                </Link>
-                <button
-                  disabled={busyId === user._id}
-                  onClick={() => handleAction("unmatch", user._id)}
-                  className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-sm hover:bg-white/20 disabled:opacity-50"
-                >
-                  Unmatch
-                </button>
-                <button
-                  disabled={busyId === user._id}
-                  onClick={() => handleAction("block", user._id)}
-                  className="px-4 py-2 rounded-full bg-red-500/80 text-white text-sm hover:bg-red-500 disabled:opacity-50"
-                >
-                  Block
-                </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {connections.map((user, idx) =>
+          user && user._id ? (
+            <article key={user._id || idx} className="surface-card p-4 flex gap-4">
+              <div className="relative shrink-0">
+                <img
+                  src={resolvePhotoUrl(user.photoUrl)}
+                  alt=""
+                  className="w-16 h-16 rounded-xl object-cover"
+                />
+                <span
+                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 ${
+                    onlineUserIds.includes(String(user._id)) ? "bg-emerald-400" : "bg-zinc-600"
+                  }`}
+                />
               </div>
-            </div>
-          </div>
-        ) : null
-      )}
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-semibold truncate">
+                  {user.firstName || "N/A"} {user.lastName || ""}
+                  {(unreadByUserId[String(user._id)] || 0) > 0 && (
+                    <span className="ml-2 text-[10px] bg-rose-600 text-white px-1.5 py-0.5 rounded-full align-middle">
+                      {unreadByUserId[String(user._id)]}
+                    </span>
+                  )}
+                </h2>
+                <p className="text-xs text-zinc-500">
+                  {onlineUserIds.includes(String(user._id)) ? "Online" : "Offline"}
+                </p>
+                {user.opener && (
+                  <p className="text-sm text-zinc-200 mt-2 border border-zinc-800 rounded-xl px-3 py-2 leading-relaxed">
+                    <span className="block text-[11px] text-zinc-500 mb-1">
+                      {user.openerFromMe ? "You opened with" : "They opened with"}
+                    </span>
+                    “{user.opener}”
+                  </p>
+                )}
+                {user.about && (
+                  <p className="text-sm text-zinc-400 line-clamp-2 mt-1">{user.about}</p>
+                )}
+                {user.age && (
+                  <p className="text-xs text-zinc-500 mt-1">
+                    {user.age} · {user.gender || ""}
+                  </p>
+                )}
+                {user.skills?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {user.skills.slice(0, 3).map((skill, sidx) => (
+                      <span key={sidx} className="text-xs px-2 py-0.5 rounded-md border border-zinc-800 text-zinc-400">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link to={"/chat/" + user._id} className="btn-primary min-h-10 text-sm">
+                    Chat
+                  </Link>
+                  <button
+                    disabled={busyId === user._id}
+                    onClick={() => handleAction("unmatch", user._id)}
+                    className="btn-secondary min-h-10 text-sm"
+                  >
+                    Unmatch
+                  </button>
+                  <button
+                    disabled={busyId === user._id}
+                    onClick={() => handleAction("block", user._id)}
+                    className="btn-danger min-h-10 text-sm"
+                  >
+                    Block
+                  </button>
+                </div>
+              </div>
+            </article>
+          ) : null
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Connections;

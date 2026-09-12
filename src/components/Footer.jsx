@@ -2,11 +2,11 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="w-full mt-auto border-t border-white/10 bg-transparent">
-      <div className="max-w-6xl mx-auto px-4 py-4 text-center">
-        <p className="text-sm text-gray-400">ByteFlame</p>
-        <p className="text-xs text-gray-600 mt-1">
-          © {new Date().getFullYear()} · Match with people who share your interests
+    <footer className="mt-auto border-t border-zinc-800">
+      <div className="page-wrap px-4 md:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p className="text-sm text-zinc-500">ByteFlame</p>
+        <p className="text-xs text-zinc-600">
+          © {new Date().getFullYear()} Dating by shared interests
         </p>
       </div>
     </footer>

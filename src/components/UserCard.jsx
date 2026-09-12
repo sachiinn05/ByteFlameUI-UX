@@ -1,11 +1,13 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { BASE_URL, resolvePhotoUrl } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeFromFeedUser } from "../utils/feedSlice";
+import IcebreakerPanel from "./IcebreakerPanel";
 
 const UserCard = ({ user }) => {
-    const dispatch=useDispatch();
+  const dispatch = useDispatch();
+  const [copied, setCopied] = useState("");
   if (!user || !user.firstName || !user.lastName) return null;
 
   const {
@@ -23,113 +25,93 @@ const UserCard = ({ user }) => {
   const sharedSet = new Set(
     (sharedSkills || []).map((s) => String(s).trim().toLowerCase())
   );
-  const handleSendRequest=async(status,userId)=>{
-    try{
-      const _res=await axios.post(
-        BASE_URL+"/request/send/"+status+"/"+userId,
-        {},
-        {withCredentials:true}
-      );
-      dispatch(removeFromFeedUser(userId))
-    }catch(err)
-    {
+  const handleSendRequest = async (status, userId, opener) => {
+    if (!userId) return;
+    try {
+      const body =
+        status === "interested" && opener
+          ? { opener: String(opener).trim().slice(0, 180) }
+          : {};
+      await axios.post(BASE_URL + "/request/send/" + status + "/" + userId, body, {
+        withCredentials: true,
+      });
+      dispatch(removeFromFeedUser(userId));
+    } catch (err) {
       console.log(err.message);
     }
-  }
+  };
 
-return (
-  <div className="group relative w-80 h-[32rem] rounded-3xl overflow-hidden 
-    shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-black transition-all duration-500 hover:scale-[1.03]">
-
-    
-    <img
-        src={resolvePhotoUrl(photoUrl)}
-      alt={`${firstName} ${lastName}`}
-      className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-110"
-    />
-
-  
-    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-
-
-    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 
-      bg-gradient-to-t from-pink-500/10 via-transparent to-purple-500/10"></div>
-
-    <div className="relative z-10 flex flex-col justify-end h-full p-4">
-
-  
-      <div className="mb-2">
+  return (
+    <article className="w-full max-w-md surface-card overflow-hidden">
+      <div className="relative h-72 bg-zinc-900">
+        <img
+          src={resolvePhotoUrl(photoUrl)}
+          alt={`${firstName} ${lastName}`}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="p-5">
         {typeof matchPercent === "number" && (
-          <span className="inline-block mb-2 px-3 py-1 text-xs font-semibold rounded-full bg-pink-500/90 text-white">
-            {matchPercent}% interest match
-          </span>
+          <p className="text-xs font-medium text-rose-400 mb-2">{matchPercent}% interest match</p>
         )}
-        <h2 className="text-2xl font-semibold text-white tracking-tight">
+        <h2 className="text-xl font-semibold tracking-tight">
           {firstName} {lastName}
-          {age && <span className="text-gray-300">, {age}</span>}
+          {age && <span className="text-zinc-400 font-normal">, {age}</span>}
         </h2>
+        {gender && <p className="text-xs text-zinc-500 capitalize mt-0.5">{gender}</p>}
+        {about && <p className="text-sm text-zinc-400 mt-3 line-clamp-3 leading-relaxed">{about}</p>}
+        {skills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {skills.slice(0, 6).map((skill, index) => (
+              <span
+                key={index}
+                className={`px-2.5 py-1 text-xs rounded-md border ${
+                  sharedSet.has(String(skill).trim().toLowerCase())
+                    ? "border-rose-900/80 text-rose-200 bg-rose-950/40"
+                    : "border-zinc-800 text-zinc-400"
+                }`}
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        )}
 
-        {gender && (
-          <p className="text-xs text-gray-400 capitalize">
-            {gender}
-          </p>
+        {_id && (
+          <div className="mt-4">
+            <IcebreakerPanel
+              targetUserId={_id}
+              sendLabel="Like & keep line"
+              onSend={async (line) => {
+                await handleSendRequest("interested", _id, line);
+                setCopied("Liked. They’ll see this opener when they get your request.");
+              }}
+            />
+            {copied && <p className="text-xs text-zinc-400 mt-2">{copied}</p>}
+          </div>
+        )}
+
+        {_id && (
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={() => handleSendRequest("ignore", _id)}
+              className="btn-secondary flex-1"
+            >
+              Skip
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSendRequest("interested", _id)}
+              className="btn-primary flex-1"
+            >
+              Like
+            </button>
+          </div>
         )}
       </div>
-
-   
-      {about && (
-        <p className="text-sm text-gray-200 line-clamp-2 mb-2">
-          {about}
-        </p>
-      )}
-
-     
-      {skills.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-3">
-          {skills.slice(0, 4).map((skill, index) => (
-            <span
-              key={index}
-              className={`px-3 py-1 text-xs backdrop-blur-md rounded-full border ${
-                sharedSet.has(String(skill).trim().toLowerCase())
-                  ? "bg-pink-500/40 text-white border-pink-400/50"
-                  : "bg-white/10 text-white border-white/10"
-              }`}
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="flex justify-center gap-6 mt-2">
-
-   
-        <button
-          onClick={() => handleSendRequest("ignore", _id)}
-          title="Skip"
-          className="w-14 h-14 flex items-center justify-center rounded-full 
-          bg-white/10 backdrop-blur-md border border-white/20 
-          text-white text-xl hover:bg-red-500/80 hover:scale-110 
-          transition-all duration-300 shadow-lg"
-        >
-          ✕
-        </button>
-
-        <button
-          onClick={() => handleSendRequest("interested", _id)}
-          title="Interested"
-          className="w-14 h-14 flex items-center justify-center rounded-full 
-          bg-gradient-to-r from-pink-500 to-red-500 
-          text-white text-xl hover:scale-110 
-          transition-all duration-300 shadow-lg"
-        >
-          ❤
-        </button>
-
-      </div>
-    </div>
-  </div>
-);
+    </article>
+  );
 };
 
 export default UserCard;

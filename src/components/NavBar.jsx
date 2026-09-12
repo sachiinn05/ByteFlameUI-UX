@@ -1,12 +1,11 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { BASE_URL, resolvePhotoUrl } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
 import { clearPresence } from "../utils/presenceSlice";
 import { disconnectSocket } from "../utils/socket";
-import { AnimatePresence, motion } from "framer-motion";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
@@ -20,6 +19,7 @@ const NavBar = () => {
   const [showAbout, setShowAbout] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
 
   const handleLogout = async () => {
     try {
@@ -33,152 +33,140 @@ const NavBar = () => {
     }
   };
 
+  useEffect(() => {
+    const onDoc = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
   const linkClass = ({ isActive }) =>
-    `relative px-3 py-2 rounded-lg text-sm font-medium transition ${
-      isActive
-        ? "text-white bg-white/10"
-        : "text-gray-300 hover:text-white hover:bg-white/5"
+    `px-3 py-2 rounded-[10px] text-sm font-medium transition-colors ${
+      isActive ? "text-white bg-white/8" : "text-zinc-400 hover:text-white hover:bg-white/5"
     }`;
 
+  const links = (
+    <>
+      <NavLink to="/feed" className={linkClass} onClick={() => setMenuOpen(false)}>
+        Discover
+      </NavLink>
+      <NavLink to="/connections" className={linkClass} onClick={() => setMenuOpen(false)}>
+        Matches
+        {totalUnread > 0 && (
+          <span className="ml-1.5 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-rose-600 text-[10px] text-white px-1">
+            {totalUnread}
+          </span>
+        )}
+      </NavLink>
+      <NavLink to="/requests" className={linkClass} onClick={() => setMenuOpen(false)}>
+        Requests
+      </NavLink>
+      <NavLink to="/profile" className={linkClass} onClick={() => setMenuOpen(false)}>
+        Profile
+      </NavLink>
+    </>
+  );
+
   return (
-    <div className="w-full fixed top-0 left-0 z-50">
-      <nav className="w-full px-4 md:px-8 py-3 flex items-center justify-between bg-[#0b1220]/90 backdrop-blur-xl border-b border-white/10">
-        <Link to={user ? "/feed" : "/"} className="flex items-center gap-3">
+    <header className="w-full fixed top-0 left-0 z-50 border-b border-zinc-800 bg-zinc-950/85 backdrop-blur-xl">
+      <nav className="page-wrap px-4 md:px-6 h-14 flex items-center justify-between gap-4">
+        <Link to={user ? "/feed" : "/"} className="flex items-center gap-2.5 shrink-0">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzNeysa26FLKrZhOZEgVsdjr5WJQq4zagAEA&s"
-            alt="ByteFlame Logo"
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-pink-500/40"
+            alt=""
+            className="w-8 h-8 rounded-lg object-cover"
           />
-          <span className="text-xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-            ByteFlame
-          </span>
+          <span className="text-[15px] font-semibold tracking-tight">ByteFlame</span>
         </Link>
 
         {user ? (
           <>
-            <div className="hidden md:flex items-center gap-1">
-              <NavLink to="/feed" className={linkClass}>
-                Discover
-              </NavLink>
-              <NavLink to="/connections" className={linkClass}>
-                Matches
-                {totalUnread > 0 && (
-                  <span className="ml-1.5 text-[10px] bg-pink-500 text-white px-1.5 py-0.5 rounded-full">
-                    {totalUnread}
-                  </span>
-                )}
-              </NavLink>
-              <NavLink to="/requests" className={linkClass}>
-                Requests
-              </NavLink>
-              <NavLink to="/profile" className={linkClass}>
-                Profile
-              </NavLink>
-            </div>
-
-            <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-0.5">{links}</div>
+            <div className="relative flex items-center gap-2" ref={profileRef}>
               <button
                 type="button"
-                className="md:hidden text-gray-200 px-3 py-2 rounded-lg border border-white/10"
+                className="md:hidden btn-secondary min-h-10 px-3 text-sm"
+                aria-expanded={menuOpen}
+                aria-label="Open menu"
                 onClick={() => setMenuOpen((v) => !v)}
               >
                 Menu
               </button>
-
               <button
                 type="button"
                 onClick={() => setProfileOpen((v) => !v)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 rounded-lg p-0.5"
+                aria-label="Account menu"
               >
-                <span className="text-gray-200 text-sm hidden sm:block">
-                  {user.firstName}
-                </span>
+                <span className="text-sm text-zinc-300 hidden sm:block">{user.firstName}</span>
                 <img
                   src={resolvePhotoUrl(user.photoUrl)}
-                  alt="user"
-                  className="w-9 h-9 rounded-full object-cover ring-2 ring-pink-400/50"
+                  alt=""
+                  className="w-8 h-8 rounded-full object-cover ring-1 ring-zinc-700"
                 />
               </button>
+              {profileOpen && (
+                <div className="absolute right-4 top-14 w-48 surface-card p-1.5 text-sm shadow-xl">
+                  <button
+                    onClick={() => {
+                      setShowAbout(true);
+                      setProfileOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2.5 rounded-lg text-zinc-300 hover:bg-white/5"
+                  >
+                    About
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-2.5 rounded-lg text-rose-300 hover:bg-rose-500/10"
+                  >
+                    Log out
+                  </button>
+                </div>
+              )}
             </div>
           </>
         ) : (
-          <button
-            onClick={() => navigate("/login")}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium"
-          >
-            Join Us
+          <button type="button" onClick={() => navigate("/login")} className="btn-primary min-h-10">
+            Sign in
           </button>
         )}
       </nav>
 
       {user && menuOpen && (
-        <div className="md:hidden bg-[#0b1220] border-b border-white/10 px-4 py-3 flex flex-col gap-1">
-          <NavLink to="/feed" className={linkClass} onClick={() => setMenuOpen(false)}>
-            Discover
-          </NavLink>
-          <NavLink to="/connections" className={linkClass} onClick={() => setMenuOpen(false)}>
-            Matches {totalUnread > 0 ? `(${totalUnread})` : ""}
-          </NavLink>
-          <NavLink to="/requests" className={linkClass} onClick={() => setMenuOpen(false)}>
-            Requests
-          </NavLink>
-          <NavLink to="/profile" className={linkClass} onClick={() => setMenuOpen(false)}>
-            Profile
-          </NavLink>
+        <div className="md:hidden border-t border-zinc-800 bg-zinc-950 px-4 py-3 flex flex-col gap-1">
+          {links}
         </div>
       )}
 
-      {user && profileOpen && (
-        <div className="absolute right-4 top-16 w-52 bg-[#111827] rounded-2xl shadow-xl border border-white/10 p-2 text-sm">
-          <button
-            onClick={() => {
-              setShowAbout(true);
-              setProfileOpen(false);
-            }}
-            className="w-full text-left px-4 py-2 rounded-lg text-gray-200 hover:bg-white/10"
+      {showAbout && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4"
+          onClick={() => setShowAbout(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="about-title"
+        >
+          <div
+            className="surface-card p-6 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
           >
-            About
-          </button>
-          <button
-            onClick={handleLogout}
-            className="w-full text-left px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10"
-          >
-            Logout
-          </button>
+            <h2 id="about-title" className="text-lg font-semibold mb-2">
+              About ByteFlame
+            </h2>
+            <p className="text-sm text-zinc-400 leading-relaxed mb-5">
+              Match on shared interests, chat in real time, and unmatch or block whenever you want.
+            </p>
+            <button type="button" className="btn-primary w-full" onClick={() => setShowAbout(false)}>
+              Close
+            </button>
+          </div>
         </div>
       )}
-
-      <AnimatePresence>
-        {showAbout && (
-          <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowAbout(false)}
-          >
-            <motion.div
-              className="bg-[#111827] rounded-3xl shadow-2xl p-8 w-[90%] md:w-[420px] text-center border border-white/10"
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-2xl font-bold text-white mb-3">About ByteFlame</h2>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                Meet people who share your interests. Match, chat in real time, and stay in control with block and unmatch.
-              </p>
-              <button
-                onClick={() => setShowAbout(false)}
-                className="px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl"
-              >
-                Close
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </header>
   );
 };
 

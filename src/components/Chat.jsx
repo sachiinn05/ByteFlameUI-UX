@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL, resolvePhotoUrl } from "../utils/constants";
 import { setTyping, setUnread } from "../utils/presenceSlice";
+import IcebreakerPanel from "./IcebreakerPanel";
 
 const Chat = () => {
   const { targetUserId } = useParams();
@@ -115,8 +116,9 @@ const Chat = () => {
     typingTimeout.current = setTimeout(() => emitTyping(false), 800);
   };
 
-  const sendMessage = () => {
-    if (!newMessage.trim() || !userId || blocked) return;
+  const sendMessage = (textOverride) => {
+    const text = (typeof textOverride === "string" ? textOverride : newMessage).trim();
+    if (!text || !userId || blocked) return;
     const socket = getSocket();
 
     socket.emit("sendMessage", {
@@ -124,7 +126,7 @@ const Chat = () => {
       lastName: user.lastName,
       userId,
       targetUserId,
-      text: newMessage,
+      text,
     });
 
     emitTyping(false);
@@ -139,11 +141,7 @@ const Chat = () => {
     if (!ok) return;
     setBusy(true);
     try {
-      await axios.post(
-        `${BASE_URL}/request/block/${targetUserId}`,
-        {},
-        { withCredentials: true }
-      );
+      await axios.post(`${BASE_URL}/request/block/${targetUserId}`, {}, { withCredentials: true });
       navigate("/connections");
     } catch (err) {
       console.error(err);
@@ -158,32 +156,19 @@ const Chat = () => {
 
   if (blocked) {
     return (
-      <div className="text-center mt-20 text-gray-300">
-        <p className="text-xl font-semibold">Chat is no longer available</p>
-        <p className="text-sm text-gray-500 mt-2">
-          This match was unmatched or blocked.
-        </p>
-        <button
-          onClick={() => navigate("/connections")}
-          className="mt-6 px-5 py-2 rounded-xl bg-pink-500 text-white"
-        >
-          Back to connections
+      <div className="max-w-md mx-auto text-center surface-card p-8 mt-8">
+        <h1 className="text-lg font-semibold">Chat is no longer available</h1>
+        <p className="page-sub">This match was unmatched or blocked.</p>
+        <button type="button" onClick={() => navigate("/connections")} className="btn-primary mt-6">
+          Back to matches
         </button>
       </div>
     );
   }
 
   return (
-    <div
-      className="flex flex-col h-[85vh] max-w-5xl mx-auto mt-6 
-  rounded-3xl overflow-hidden 
-  bg-gradient-to-br from-[#020617] via-[#0f172a] to-black 
-  border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
-    >
-      <div
-        className="flex items-center gap-4 px-5 py-4 
-    border-b border-white/10 bg-white/5 backdrop-blur-xl"
-      >
+    <div className="flex flex-col h-[calc(100dvh-8.5rem)] max-w-3xl mx-auto surface-card overflow-hidden">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-zinc-800">
         <div className="relative">
           <img
             src={
@@ -191,58 +176,49 @@ const Chat = () => {
                 ? resolvePhotoUrl(targetUser.photoUrl)
                 : `https://api.multiavatar.com/${targetUserId}.svg`
             }
-            alt="user"
-            className="w-12 h-12 rounded-full object-cover border border-white/20"
+            alt=""
+            className="w-10 h-10 rounded-full object-cover"
           />
           <span
-            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 ${
-              isOnline ? "bg-green-400" : "bg-gray-500"
+            className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 ${
+              isOnline ? "bg-emerald-400" : "bg-zinc-600"
             }`}
           />
         </div>
-
-        <div>
-          <h2 className="text-white font-semibold text-lg leading-tight">
-            {targetUser
-              ? `${targetUser.firstName} ${targetUser.lastName || ""}`
-              : "Loading..."}
+        <div className="min-w-0 flex-1">
+          <h2 className="font-semibold text-sm truncate">
+            {targetUser ? `${targetUser.firstName} ${targetUser.lastName || ""}` : "Loading…"}
           </h2>
-          <p className={`text-xs ${isOnline ? "text-green-400" : "text-gray-400"}`}>
-            {isTargetTyping ? "typing..." : isOnline ? "● Online" : "Offline"}
+          <p className="text-xs text-zinc-500">
+            {isTargetTyping ? "Typing…" : isOnline ? "Online" : "Offline"}
           </p>
         </div>
-        <button
-          disabled={busy}
-          onClick={handleBlock}
-          className="px-4 py-2 rounded-full bg-red-500/80 text-white text-sm hover:bg-red-500 disabled:opacity-50"
-        >
-          Block
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <IcebreakerPanel
+            compact
+            targetUserId={targetUserId}
+            sendLabel="Send"
+            onSend={(line) => sendMessage(line)}
+          />
+          <button type="button" disabled={busy} onClick={handleBlock} className="btn-danger min-h-10 text-sm">
+            Block
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3">
         {messages.length === 0 ? (
-          <p className="text-center text-gray-500 mt-10">
-            Start the conversation 🚀
-          </p>
+          <p className="text-center text-zinc-500 text-sm mt-10">No messages yet. Say hello.</p>
         ) : (
           messages.map((msg, index) => {
             const isOwn =
-              String(msg.senderId) === String(userId) ||
-              msg.firstName === user.firstName;
-
+              String(msg.senderId) === String(userId) || msg.firstName === user.firstName;
             return (
-              <div
-                key={index}
-                className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
-              >
+              <div key={index} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm 
-                shadow-lg backdrop-blur-md ${
-                  isOwn
-                    ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                    : "bg-white/10 text-gray-200 border border-white/10"
-                }`}
+                  className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm leading-relaxed ${
+                    isOwn ? "bg-rose-600 text-white" : "bg-zinc-900 text-zinc-200 border border-zinc-800"
+                  }`}
                 >
                   {msg.text}
                 </div>
@@ -250,36 +226,20 @@ const Chat = () => {
             );
           })
         )}
-
-        {isTargetTyping && (
-          <p className="text-xs text-gray-400">typing...</p>
-        )}
-
-        <div ref={messagesEndRef}></div>
+        {isTargetTyping && <p className="text-xs text-zinc-500">Typing…</p>}
+        <div ref={messagesEndRef} />
       </div>
 
-      <div
-        className="flex items-center gap-3 p-4 
-    border-t border-white/10 bg-white/5 backdrop-blur-xl"
-      >
+      <div className="flex items-center gap-2 p-3 border-t border-zinc-800">
         <input
           value={newMessage}
           onChange={handleInputChange}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="Type a message..."
-          className="flex-1 px-4 py-2 rounded-xl 
-        bg-white/10 border border-white/10 
-        text-white placeholder-gray-400 
-        focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+          placeholder="Message"
+          className="input-field flex-1"
+          aria-label="Message"
         />
-
-        <button
-          onClick={sendMessage}
-          className="px-5 py-2 rounded-xl 
-        bg-gradient-to-r from-pink-500 to-purple-500 
-        text-white font-medium shadow-lg 
-        hover:scale-105 transition"
-        >
+        <button type="button" onClick={sendMessage} className="btn-primary shrink-0">
           Send
         </button>
       </div>
